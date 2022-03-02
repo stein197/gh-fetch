@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"allowUnusedLabels": false
+	},
+	"extends": "./tsconfig.default.json"
+}

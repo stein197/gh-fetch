@@ -1,0 +1,33 @@
+{
+  "name": "@stein197/gh-export",
+  "version": "0.1.0",
+  "description": "Script that exports all GitHub user repositories",
+  "main": "index.js",
+  "scripts": {
+    "build:dev": "tsc --project tsconfig.default.json",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stein197/gh-export.git"
+  },
+  "keywords": [
+    "github",
+    "repo",
+    "export",
+    "repositories",
+    "repos"
+  ],
+  "author": "Nail' Gafarov <nil20122013@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stein197/gh-export/issues"
+  },
+  "homepage": "https://github.com/stein197/gh-export#readme",
+  "dependencies": {
+    "octokit": "1.7.1"
+  },
+  "devDependencies": {
+    "typescript": "4.6.2"
+  }
+}
