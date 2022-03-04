@@ -3,7 +3,7 @@ Exports all repositories that user have to the current directory.
 
 ## Usage
 ```
-node index.js <user> [<auth>] [{--verbose | -v}]
+node index.js <user> <auth> [{--verbose | -v}]
 ```
 Where:
 - `<user>` - GitHub user name
