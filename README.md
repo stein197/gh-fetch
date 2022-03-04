@@ -1,11 +1,11 @@
 # Script that exports all GitHub user repositories
-Exports all repositories that user have to the current directory.
+Exports all GitHub repositories that user have to the current directory.
 
 ## Usage
 ```
 node index.js <user> <auth> [{--verbose | -v}]
 ```
 Where:
-- `<user>` - GitHub user name
-- `<auth>` - Auth token to authorize
+- `<user>` - User name
+- `<auth>` - Personal access token
 - `--verbose`, `-v` - Enable verbose output
