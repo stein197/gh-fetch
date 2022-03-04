@@ -56,11 +56,11 @@ function exportRepos(repos, dir) {
 }
 
 function repoPull(dir, name) {
-	repoOp("git pull", dir, `Pulling ${name} repository...`, `Pulling ${name} repository is done!`);
+	repoOp("git pull", dir, `Pulling ${name} repository into ${dir}...`, `Pulling ${name} repository is done!`);
 }
 
 function repoClone(url, name, dir) {
-	repoOp(`git clone ${url}`, dir, `Cloning ${name} repository...`, `Cloning ${name} repository is done!`);
+	repoOp(`git clone ${url}`, dir, `Cloning ${name} repository into ${dir}...`, `Cloning ${name} repository is done!`);
 }
 
 function repoOp(op, dir, msgBefore, msgAfter) {
