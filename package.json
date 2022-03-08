@@ -1,7 +1,7 @@
 {
   "name": "@stein197/gh-export",
-  "version": "0.1.0",
-  "description": "Script that exports all GitHub user repositories",
+  "version": "0.2.0",
+  "description": "Script that exports all GitHub user repositories and gists",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -9,10 +9,9 @@
   },
   "keywords": [
     "github",
-    "repo",
     "export",
-    "repositories",
-    "repos"
+    "repo",
+    "gist"
   ],
   "author": "Nail' Gafarov <nil20122013@gmail.com>",
   "license": "MIT",
