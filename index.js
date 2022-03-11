@@ -103,7 +103,9 @@ async function exportGist(gist, dir) {
 			fs.mkdirSync(fileDir, {
 				recursive: true
 			});
-		fs.writeFileSync(path.resolve(gistDir, file.filename), response.data);
+		const filePath = path.resolve(gistDir, file.filename);
+		if (!fs.existsSync(filePath) || fs.readFileSync(filePath).toString() !== response.data)
+			fs.writeFileSync(path.resolve(gistDir, file.filename), response.data);
 	}
 	log(`Updating gist ${gist.name} is done!`);
 }
