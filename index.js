@@ -7,9 +7,12 @@ const process = require("process");
 
 const OPTS = {
 	...{
-		projectsDir: "Projects",
+		reposDir: "Projects",
 		gistsDir: "Gists",
-		verbose: false
+		gistsPlain: false,
+		verbose: false,
+		noRepos: false,
+		noGists: false
 	},
 	...Object.fromEntries(
 		process.argv
@@ -38,11 +41,15 @@ const SCHEMA_GISTS = {
 		throw new Error("User name is not provided");
 	if (!auth)
 		throw new Error("Auth token is not provided");
-	const repos = await fetchData(user, auth, API_USER_REPOS, SCHEMA_REPOS);
-	const gists = await fetchData(user, auth, API_GISTS, SCHEMA_GISTS);
 	const cwd = process.cwd();
-	exportData(repos, path.resolve(cwd, OPTS.projectsDir), exportRepo);
-	exportData(gists, path.resolve(cwd, OPTS.gistsDir), exportGist);
+	if (!OPTS.noRepos) {
+		const repos = await fetchData(user, auth, API_USER_REPOS, SCHEMA_REPOS);
+		exportData(repos, path.resolve(cwd, OPTS.reposDir), exportRepo);
+	}
+	if (!OPTS.noGists) {
+		const gists = await fetchData(user, auth, API_GISTS, SCHEMA_GISTS);
+		exportData(gists, path.resolve(cwd, OPTS.gistsDir), exportGist);
+	}
 })(...process.argv.slice(2));
 
 async function fetchData(user, auth, path, schema) {
@@ -91,7 +98,7 @@ async function exportRepo(repo, dir) {
 }
 
 async function exportGist(gist, dir) {
-	const gistDir = path.resolve(dir, gist.name);
+	const gistDir = OPTS.gistsPlain ? dir : path.resolve(dir, gist.name);
 	if (!fs.existsSync(gistDir))
 		fs.mkdirSync(gistDir);
 	log(`Updating gist ${gist.name} into ${dir}...`);
