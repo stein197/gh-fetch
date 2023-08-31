@@ -1,5 +1,6 @@
 /**
  * @typedef {{
+ * 	root: string;
  * 	opts: Options;
  * 	logger: Logger;
  * }} Application
@@ -24,15 +25,16 @@ const Type = {
 };
 
 /**
+ * @param {string} root
  * @param {string} type
  * @param {Partial<Options>} opts
  * @param {Logger} logger
  * @returns {Promise}
  */
-module.exports = function (type, opts, logger) {
+module.exports = function (root, type, opts, logger) {
 	type_check(type);
 	options_check(opts);
-	const app = app_create(opts, logger);
+	const app = app_create(root, opts, logger);
 	switch (type) {
 		case Type.Repo:
 			break;
@@ -62,10 +64,11 @@ function options_check(opts) {
 }
 
 /**
+ * @param {string} root
  * @param {Options} opts
  * @param {Logger} logger
  * @returns {Application}
  */
-function app_create(opts, logger) {
-	return {opts, logger};
+function app_create(root, opts, logger) {
+	return {root, opts, logger};
 }

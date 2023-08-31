@@ -11,8 +11,9 @@ const index = require(".");
 	const data = arg.parse(args);
 	const [type] = data.args;
 	const logger = logger_create();
+	const root = process.cwd();
 	try {
-		await index(type, data.opts, logger);
+		await index(root, type, data.opts, logger);
 	} catch (e) {
 		logger.error(e.message);
 		process.exit(1);
@@ -21,14 +22,8 @@ const index = require(".");
 
 function logger_create() {
 	return {
-		info(msg) {
-			console.info(colors.white(`[INFO]: ${msg}`));
-		},
-		success(msg) {
-			console.log(colors.green(`[SUCCESS]: ${msg}`));
-		},
-		error(msg) {
-			console.error(colors.red(`[ERROR]: ${msg}`));
-		}
+		info: msg => console.info(colors.white(`[INFO]: ${msg}`)),
+		success: msg => console.log(colors.green(`[SUCCESS]: ${msg}`)),
+		error: msg => console.error(colors.red(`[ERROR]: ${msg}`))
 	};
 }
