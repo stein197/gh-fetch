@@ -15,6 +15,7 @@ const index = require(".");
 		await index(type, data.opts, logger);
 	} catch (e) {
 		logger.error(e.message);
+		process.exit(1);
 	}
 })(...process.argv.slice(2));
 
