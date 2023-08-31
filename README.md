@@ -1,18 +1,19 @@
-# Script that exports all GitHub user repositories and gists
-Exports all GitHub repositories and gists that user have to the current directory.
+# Script that syncs all GitHub user repositories and gists
+Syncs all GitHub repositories and gists that user have to the current directory.
 
 ## Usage
+Via npm:
 ```
-node index.js <user> <auth> [--verbose] [--gistsDir=<dir>] [--reposDir=<dir>] [--gistsPlain] [--noRepos] [--noGists]
+npm i -g @stein197/gh-sync
+gh-sync {repo | gist} --user <user> --auth <auth>
 ```
-Where:
-- `<user>` - User name
-- `<auth>` - Personal access token
-- `--verbose` - Enable verbose output
-- `--gistsDir` - Where to place gists. `Gists` by default
-- `--reposDir` - Where to place repositories. `Projects` by default
-- `--gistsPlain` - Place all files in a single directory rather than in individual directories
-- `--noRepos` - Do not update repositories
-- `--noGists` - Do not update gists
+Or directly from the repository:
+```
+node bin.js {repo | gist} --user <user> --auth <auth>
+```
 
-This will create two folders in the current directory: Gists and Projects.
+Where:
+- `{repo | gist}` what kind of repository to sync
+- `<user>` GitHub username
+- `<auth>` GitHub Access Token
+

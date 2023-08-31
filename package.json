@@ -1,22 +1,26 @@
 {
-  "name": "@stein197/gh-export",
-  "version": "0.2.1",
-  "description": "Script that exports all GitHub user repositories and gists",
+  "name": "@stein197/gh-sync",
+  "version": "0.3.0",
+  "description": "Script that syncs all GitHub user repositories and gists",
   "main": "index.js",
+  "bin": "bin.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stein197/gh-export.git"
+    "url": "git+https://github.com/stein197/gh-sync.git"
   },
   "keywords": [
     "github",
-    "export",
+    "sync",
     "repo",
     "gist"
   ],
   "author": "Nail' Gafarov <nil20122013@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/stein197/gh-export/issues"
+    "url": "https://github.com/stein197/gh-sync/issues"
   },
-  "homepage": "https://github.com/stein197/gh-export#readme"
+  "homepage": "https://github.com/stein197/gh-sync#readme",
+  "dependencies": {
+    "@stein197/cli": "1.1.0"
+  }
 }
