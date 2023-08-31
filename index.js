@@ -1,5 +1,10 @@
 /**
  * @typedef {{
+ * 	opts: Options;
+ * 	logger: Logger;
+ * }} Application
+ * 
+ * @typedef {{
  * 	user: string;
  * 	auth: string;
  * }} Options
@@ -27,6 +32,7 @@ const Type = {
 module.exports = function (type, opts, logger) {
 	type_check(type);
 	options_check(opts);
+	const app = app_create(opts, logger);
 	switch (type) {
 		case Type.Repo:
 			break;
@@ -53,4 +59,13 @@ function options_check(opts) {
 		throw new Error("User is not provided");
 	if (!opts.auth?.length)
 		throw new Error("Auth is not provided");
+}
+
+/**
+ * @param {Options} opts
+ * @param {Logger} logger
+ * @returns {Application}
+ */
+function app_create(opts, logger) {
+	return {opts, logger};
 }
