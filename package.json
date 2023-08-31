@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/stein197/gh-sync#readme",
   "dependencies": {
-    "@stein197/cli": "1.1.0"
+    "@stein197/cli": "1.1.0",
+    "colors": "1.4.0"
   }
 }
