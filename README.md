@@ -9,11 +9,12 @@ gh-sync {repo | gist} --user <user> --auth <auth>
 ```
 Or directly from the repository:
 ```
-node bin.js {repo | gist} --user <user> --auth <auth>
+node bin.js {repo | gist} --user <user> --auth <auth> [--fake]
 ```
 
 Where:
 - `{repo | gist}` what kind of repository to sync
 - `<user>` GitHub username
 - `<auth>` GitHub Access Token
+- `--fake` Do not perform real actions, just see what would happen
 

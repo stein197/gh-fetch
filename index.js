@@ -3,6 +3,7 @@
  * 	root: string;
  * 	opts: Options;
  * 	logger: Logger;
+ * 	do(f: () => void): void;
  * }} Application
  * 
  * @typedef {{
@@ -27,6 +28,7 @@
  * @typedef {{
  * 	user: string;
  * 	auth: string;
+ * 	fake?: boolean;
  * }} Options
  * 
  * @typedef {{
@@ -117,7 +119,7 @@ function repo_sync(repo, app) {
  */
 function git_pull(app, dir) {
 	app.logger.info(`Pulling ${dir}...`);
-	exec(dir, "git pull");
+	app.do(() => exec(dir, "git pull"));
 	app.logger.success(`${dir} has been successfully pulled`);
 }
 
@@ -127,7 +129,7 @@ function git_pull(app, dir) {
  */
 function git_fetch(app, dir) {
 	app.logger.info(`Fetching ${dir}...`);
-	exec(dir, "git fetch");
+	app.do(() => exec(dir, "git fetch"));
 	app.logger.success(`${dir} has been successfully fetched`);
 }
 
@@ -137,7 +139,7 @@ function git_fetch(app, dir) {
  */
 function git_clone(app, url) {
 	app.logger.info(`Cloning ${url}...`);
-	exec(app.root, `git clone ${url}`);
+	app.do(() => exec(app.root, `git clone ${url}`));
 	app.logger.success(`${url} has been successfully cloned`);
 }
 
@@ -174,7 +176,7 @@ function options_check(opts) {
  * @returns {Application}
  */
 function app_create(root, opts, logger) {
-	return {root, opts, logger};
+	return {root, opts, logger, do: f => !opts.fake && f()};
 }
 
 /**
