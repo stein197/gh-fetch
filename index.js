@@ -93,70 +93,45 @@ function repo_sync(repo, app) {
 	const repo_exists = fs.existsSync(repo_dir);
 	if (repo_exists)
 		except(() => {
-			repo_pull(repo, app);
+			git_pull(app, repo_dir);
 		}).catch(() => {
 			app.logger.info(`Failed to pull ${repo.name} repository. Trying to fetch it...`);
-			repo_fetch(repo, app);
+			git_fetch(app, repo_dir);
 		}).catch(() => {
 			app.logger.error(`Failed to fetch ${repo.name} repository`);
 		});
 	else
-		repo_clone(repo, app);
-}
-
-/**
- * @param {GitHub.Repository} repo
- * @param {Application} app
- */
-function repo_pull(repo, app) {
-	repo_do(
-		app,
-		`Pulling ${repo.name} repository...`,
-		`${repo.name} repository has been successfully pulled`,
-		path.resolve(app.root, repo.name),
-		() => execSync("git pull")
-	);
-}
-
-/**
- * @param {GitHub.Repository} repo
- * @param {Application} app
- */
-function repo_fetch(repo, app) {
-	repo_do(
-		app,
-		`Fetching ${repo.name} repository...`,
-		`${repo.name} repository has been successfully fetched...`,
-		path.resolve(app.root, repo.name),
-		() => execSync("git fetch")
-	);
-}
-
-/**
- * @param {GitHub.Repository} repo
- * @param {Application} app
- */
-function repo_clone(repo, app) {
-	repo_do(
-		app,
-		`Cloning ${repo.name} repository...`,
-		`${repo.name} repository has been successfully cloned`,
-		app.root,
-		() => execSync(`git clone git@github.com:${app.opts.user}/${repo.name}`)
-	);
+		git_clone(app, `git@github.com:${app.opts.user}/${repo.name}`);
 }
 
 /**
  * @param {Application} app
- * @param {string} msg_info
- * @param {string} msg_success
  * @param {string} dir
- * @param {() => void} f
  */
-function repo_do(app, msg_info, msg_success, dir, f) {
-	app.logger.info(msg_info);
-	dir_do(app.root, dir, f);
-	app.logger.success(msg_success);
+function git_pull(app, dir) {
+	app.logger.info(`Pulling ${dir}...`);
+	dir_do(app.root, dir, () => execSync("git pull"));
+	app.logger.success(`${dir} has been successfully pulled`);
+}
+
+/**
+ * @param {Application} app
+ * @param {string} dir
+ */
+function git_fetch(app, dir) {
+	app.logger.info(`Fetching ${dir}...`);
+	dir_do(app.root, dir, () => execSync("git fetch"));
+	app.logger.success(`${dir} has been successfully fetched`);
+}
+
+/**
+ * @param {Application} app
+ * @param {string} url
+ */
+function git_clone(app, url) {
+	app.logger.info(`Cloning ${url}...`);
+	dir_do(app.root, url, () => execSync(`git clone ${url}`));
+	app.logger.success(`${url} has been successfully fetched`);
 }
 
 /**
