@@ -131,7 +131,7 @@ function git_fetch(app, dir) {
 function git_clone(app, url) {
 	app.logger.info(`Cloning ${url}...`);
 	dir_do(app.root, url, () => execSync(`git clone ${url}`));
-	app.logger.success(`${url} has been successfully fetched`);
+	app.logger.success(`${url} has been successfully cloned`);
 }
 
 /**
