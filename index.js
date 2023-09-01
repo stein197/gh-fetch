@@ -80,7 +80,9 @@ async function gist_sync_all(app) {
  * @param {GitHub.Repository} repo
  * @param {Application} app
  */
-function repo_sync(repo, app) {} // TODO
+function repo_sync(repo, app) {
+
+} // TODO
 
 /**
  * @param {GitHub.Gist} gist
@@ -99,6 +101,7 @@ function type_check(type) {
 
 /**
  * @param {Partial<Options>} opts
+ * @returns {asserts opts is Options}
  */
 function options_check(opts) {
 	if (!opts.user?.length)
