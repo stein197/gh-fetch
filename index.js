@@ -48,6 +48,8 @@ const Type = {
 	Repo: "repo",
 	Gist: "gist"
 };
+/** @type {Application} */
+let app;
 
 /**
  * @param {string} root
@@ -57,87 +59,79 @@ const Type = {
  * @returns {Promise}
  */
 module.exports = function (root, type, opts, logger) {
-	type_check(type);
-	options_check(opts);
-	const app = app_create(root, opts, logger);
+	app = app_create(root, type, opts, logger);
 	switch (type) {
-		case Type.Repo: return repo_sync_all(app);
-		case Type.Gist: return gist_sync_all(app);
+		case Type.Repo: return repo_sync_all();
+		case Type.Gist: return gist_sync_all();
 	}
 	return Promise.resolve();
 }
 
 /**
- * @param {Application} app
  * @returns {Promise}
  */
-async function repo_sync_all(app) {
+async function repo_sync_all() {
 	app.logger.info("Fetching repositories info...");
 	const data = await repo_fetch_all(app.opts.user, app.opts.auth);
 	for (const repo of data)
-		repo_sync(repo, app);
+		repo_sync(repo);
 }
 
 /**
- * @param {Application} app
  * @returns {Promise}
  */
-async function gist_sync_all(app) {
+async function gist_sync_all() {
 	app.logger.info("Fetching gist info...");
 	const data = await gist_fetch_all(app.opts.user, app.opts.auth);
 	for (const gist of data)
-		gist_sync(gist, app);
+		gist_sync(gist);
 }
 
 /**
  * @param {GitHub.Repository} repo
- * @param {Application} app
  */
-function repo_sync(repo, app) {
+function repo_sync(repo) {
 	const repo_dir = path.resolve(app.root, repo.name);
 	const repo_exists = fs.existsSync(repo_dir);
 	if (repo_exists)
 		except(() => {
-			git_pull(app, repo_dir);
+			git_pull(repo_dir);
 		}).catch(() => {
 			app.logger.error(`Failed to pull ${repo.name} repository. Trying to fetch it...`);
-			git_fetch(app, repo_dir);
+			git_fetch(repo_dir);
 		}).catch(() => {
 			app.logger.error(`Failed to fetch ${repo.name} repository`);
 		});
 	else
 		try {
-			git_clone(app, `git@github.com:${app.opts.user}/${repo.name}`);
+			git_clone(`git@github.com:${app.opts.user}/${repo.name}`);
 		} catch {
 			app.logger.error(`Failed to clone ${repo.name} repository`);
 		}
 }
 
 /**
- * @param {Application} app
  * @param {string} dir
  */
-function git_pull(app, dir) {
+function git_pull(dir) {
 	app.logger.info(`Pulling ${dir}...`);
 	app.do(() => exec(dir, "git pull"));
 	app.logger.success(`${dir} has been successfully pulled`);
 }
 
 /**
- * @param {Application} app
  * @param {string} dir
  */
-function git_fetch(app, dir) {
+function git_fetch(dir) {
 	app.logger.info(`Fetching ${dir}...`);
 	app.do(() => exec(dir, "git fetch"));
 	app.logger.success(`${dir} has been successfully fetched`);
 }
 
 /**
- * @param {Application} app
  * @param {string} url
  */
-function git_clone(app, url) {
+function git_clone(url) {
 	app.logger.info(`Cloning ${url}...`);
 	app.do(() => exec(app.root, `git clone ${url}`));
 	app.logger.success(`${url} has been successfully cloned`);
@@ -145,9 +139,8 @@ function git_clone(app, url) {
 
 /**
  * @param {GitHub.Gist} gist
- * @param {Application} app
  */
-function gist_sync(gist, app) {} // TODO
+function gist_sync(gist) {} // TODO
 
 /**
  * @param {string} type
@@ -171,11 +164,14 @@ function options_check(opts) {
 
 /**
  * @param {string} root
- * @param {Options} opts
+ * @param {string} type
+ * @param {Partial<Options>} opts
  * @param {Logger} logger
  * @returns {Application}
  */
-function app_create(root, opts, logger) {
+function app_create(root, type, opts, logger) {
+	type_check(type);
+	options_check(opts);
 	return {root, opts, logger, do: f => !opts.fake && f()};
 }
 
