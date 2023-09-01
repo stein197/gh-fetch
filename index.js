@@ -104,7 +104,11 @@ function repo_sync(repo, app) {
 			app.logger.error(`Failed to fetch ${repo.name} repository`);
 		});
 	else
-		git_clone(app, `git@github.com:${app.opts.user}/${repo.name}`);
+		try {
+			git_clone(app, `git@github.com:${app.opts.user}/${repo.name}`);
+		} catch {
+			app.logger.error(`Failed to clone ${repo.name} repository`);
+		}
 }
 
 /**
