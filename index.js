@@ -6,6 +6,11 @@
  * }} Application
  * 
  * @typedef {{
+ * 	catch(f: (error: any) => void): Except;
+ * 	finally(f: () => void): void;
+ * }} Except
+ * 
+ * @typedef {{
  * 	id: string;
  * }} GitHub.Gist
  * 
@@ -86,16 +91,14 @@ function repo_sync(repo, app) {
 	const repo_dir = path.resolve(app.root, repo.name);
 	const repo_exists = fs.existsSync(repo_dir);
 	if (repo_exists)
-		try {
+		except(() => {
 			repo_pull(repo, app);
-		} catch {
+		}).catch(() => {
 			app.logger.info(`Failed to pull ${repo.name} repository. Trying to fetch it...`);
-			try {
-				repo_fetch(repo, app);
-			} catch {
-				app.logger.error(`Failed to fetch ${repo.name} repository`);
-			}
-		}
+			repo_fetch(repo, app);
+		}).catch(() => {
+			app.logger.error(`Failed to fetch ${repo.name} repository`);
+		});
 	else
 		repo_clone(repo, app);
 }
@@ -198,4 +201,34 @@ async function data_fetch(endpoint, user, auth) {
 		page++;
 	}
 	return result;
+}
+
+/**
+ * @param {() => void} f
+ * @returns {Except}
+ */
+function except(f) {
+	let error = null;
+	const obj = {
+		catch(f) {
+			if (error != null) {
+				try {
+					f(error);
+					error = null;
+				} catch (e) {
+					error = e;
+				}
+			}
+			return this;
+		},
+		finally(f) {
+			f();
+		}
+	};
+	try {
+		f();
+	} catch (e) {
+		error = e;
+	}
+	return obj;
 }
