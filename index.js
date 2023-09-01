@@ -98,7 +98,7 @@ function repo_sync(repo, app) {
 		except(() => {
 			git_pull(app, repo_dir);
 		}).catch(() => {
-			app.logger.info(`Failed to pull ${repo.name} repository. Trying to fetch it...`);
+			app.logger.error(`Failed to pull ${repo.name} repository. Trying to fetch it...`);
 			git_fetch(app, repo_dir);
 		}).catch(() => {
 			app.logger.error(`Failed to fetch ${repo.name} repository`);
@@ -117,7 +117,7 @@ function repo_sync(repo, app) {
  */
 function git_pull(app, dir) {
 	app.logger.info(`Pulling ${dir}...`);
-	dir_do(app.root, dir, () => execSync("git pull"));
+	exec(dir, "git pull");
 	app.logger.success(`${dir} has been successfully pulled`);
 }
 
@@ -127,7 +127,7 @@ function git_pull(app, dir) {
  */
 function git_fetch(app, dir) {
 	app.logger.info(`Fetching ${dir}...`);
-	dir_do(app.root, dir, () => execSync("git fetch"));
+	exec(dir, "git fetch");
 	app.logger.success(`${dir} has been successfully fetched`);
 }
 
@@ -137,7 +137,7 @@ function git_fetch(app, dir) {
  */
 function git_clone(app, url) {
 	app.logger.info(`Cloning ${url}...`);
-	dir_do(app.root, url, () => execSync(`git clone ${url}`));
+	exec(app.root, `git clone ${url}`);
 	app.logger.success(`${url} has been successfully cloned`);
 }
 
@@ -254,12 +254,12 @@ function except(f) {
 }
 
 /**
- * @param {string} base
  * @param {string} dir
- * @param {() => void} f
+ * @param {string} cmd
+ * @returns {Buffer}
  */
-function dir_do(base, dir, f) {
-	process.chdir(dir);
-	f();
-	process.chdir(base);
+function exec(dir, cmd) {
+	return execSync(cmd, {
+		cwd: dir
+	});
 }
