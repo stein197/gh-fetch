@@ -29,6 +29,8 @@
  */
 
 // @ts-check
+const fs = require("node:fs");
+const path = require("node:path");
 
 const API_HOST = "https://api.github.com";
 const Type = {
@@ -81,8 +83,40 @@ async function gist_sync_all(app) {
  * @param {Application} app
  */
 function repo_sync(repo, app) {
+	const repo_dir = path.resolve(app.root, repo.name);
+	const repo_exists = fs.existsSync(repo_dir);
+	if (repo_exists)
+		try {
+			repo_pull(repo, app);
+		} catch {
+			app.logger.info(`Failed to pull ${repo.name} repository. Trying to fetch it...`);
+			try {
+				repo_fetch(repo, app);
+			} catch {
+				app.logger.error(`Failed to fetch ${repo.name} repository`);
+			}
+		}
+	else
+		repo_clone(repo, app);
+}
 
-} // TODO
+/**
+ * @param {GitHub.Repository} repo
+ * @param {Application} app
+ */
+function repo_pull(repo, app) {} // TODO
+
+/**
+ * @param {GitHub.Repository} repo
+ * @param {Application} app
+ */
+function repo_fetch(repo, app) {} // TODO
+
+/**
+ * @param {GitHub.Repository} repo
+ * @param {Application} app
+ */
+function repo_clone(repo, app) {} // TODO
 
 /**
  * @param {GitHub.Gist} gist
