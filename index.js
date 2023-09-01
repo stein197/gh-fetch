@@ -36,6 +36,7 @@
 // @ts-check
 const fs = require("node:fs");
 const path = require("node:path");
+const {execSync} = require("node:child_process");
 
 const API_HOST = "https://api.github.com";
 const Type = {
@@ -107,19 +108,56 @@ function repo_sync(repo, app) {
  * @param {GitHub.Repository} repo
  * @param {Application} app
  */
-function repo_pull(repo, app) {} // TODO
+function repo_pull(repo, app) {
+	repo_do(
+		app,
+		`Pulling ${repo.name} repository...`,
+		`${repo.name} repository has been successfully pulled`,
+		path.resolve(app.root, repo.name),
+		() => execSync("git pull")
+	);
+}
 
 /**
  * @param {GitHub.Repository} repo
  * @param {Application} app
  */
-function repo_fetch(repo, app) {} // TODO
+function repo_fetch(repo, app) {
+	repo_do(
+		app,
+		`Fetching ${repo.name} repository...`,
+		`${repo.name} repository has been successfully fetched...`,
+		path.resolve(app.root, repo.name),
+		() => execSync("git fetch")
+	);
+}
 
 /**
  * @param {GitHub.Repository} repo
  * @param {Application} app
  */
-function repo_clone(repo, app) {} // TODO
+function repo_clone(repo, app) {
+	repo_do(
+		app,
+		`Cloning ${repo.name} repository...`,
+		`${repo.name} repository has been successfully cloned`,
+		app.root,
+		() => execSync(`git clone git@github.com:${app.opts.user}/${repo.name}`)
+	);
+}
+
+/**
+ * @param {Application} app
+ * @param {string} msg_info
+ * @param {string} msg_success
+ * @param {string} dir
+ * @param {() => void} f
+ */
+function repo_do(app, msg_info, msg_success, dir, f) {
+	app.logger.info(msg_info);
+	dir_do(app.root, dir, f);
+	app.logger.success(msg_success);
+}
 
 /**
  * @param {GitHub.Gist} gist
@@ -231,4 +269,15 @@ function except(f) {
 		error = e;
 	}
 	return obj;
+}
+
+/**
+ * @param {string} base
+ * @param {string} dir
+ * @param {() => void} f
+ */
+function dir_do(base, dir, f) {
+	process.chdir(dir);
+	f();
+	process.chdir(base);
 }
