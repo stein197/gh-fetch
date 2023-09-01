@@ -12,6 +12,9 @@
  * 
  * @typedef {{
  * 	id: string;
+ * 	owner: {
+ * 		login: string;
+ * 	}
  * }} GitHub.Gist
  * 
  * @typedef {{
@@ -185,7 +188,7 @@ function repo_fetch_all(user, auth) {
  * @returns {Promise<GitHub.Gist[]>}
  */
 function gist_fetch_all(user, auth) {
-	return data_fetch("/gists", user, auth);
+	return data_fetch("/gists", user, auth).then(data => data.filter(gist => gist.owner.login === user));
 }
 
 /**
