@@ -69,24 +69,33 @@ module.exports = function (root, type, opts, logger) {
 	return Promise.resolve();
 }
 
+// #region git
+
 /**
- * @returns {Promise}
+ * @param {string} url
  */
-async function repo_sync_all() {
-	app.logger.info("Fetching repositories info...");
-	const data = await repo_fetch_all(app.opts.user, app.opts.auth);
-	for (const repo of data)
-		git_sync(repo.name, `git@github.com:${app.opts.user}/${repo.name}`);
+function git_clone(url) {
+	app.logger.info(`Cloning ${url}...`);
+	app.do(() => exec(app.root, `git clone ${url}`));
+	app.logger.success(`${url} has been successfully cloned`);
 }
 
 /**
- * @returns {Promise}
+ * @param {string} dir
  */
-async function gist_sync_all() {
-	app.logger.info("Fetching gist info...");
-	const data = await gist_fetch_all(app.opts.user, app.opts.auth);
-	for (const gist of data)
-		git_sync(gist.id, gist.git_pull_url);
+function git_fetch(dir) {
+	app.logger.info(`Fetching ${dir}...`);
+	app.do(() => exec(dir, "git fetch"));
+	app.logger.success(`${dir} has been successfully fetched`);
+}
+
+/**
+ * @param {string} dir
+ */
+function git_pull(dir) {
+	app.logger.info(`Pulling ${dir}...`);
+	app.do(() => exec(dir, "git pull"));
+	app.logger.success(`${dir} has been successfully pulled`);
 }
 
 /**
@@ -113,32 +122,53 @@ function git_sync(name, url) {
 		}
 }
 
+// #endregion
+
+// #region gist
+
 /**
- * @param {string} dir
+ * @param {string} user
+ * @param {string} auth
+ * @returns {Promise<GitHub.Gist[]>}
  */
-function git_pull(dir) {
-	app.logger.info(`Pulling ${dir}...`);
-	app.do(() => exec(dir, "git pull"));
-	app.logger.success(`${dir} has been successfully pulled`);
+function gist_fetch_all(user, auth) {
+	return data_fetch("/gists", user, auth).then(data => data.filter(gist => gist.owner.login === user));
 }
 
 /**
- * @param {string} dir
+ * @returns {Promise}
  */
-function git_fetch(dir) {
-	app.logger.info(`Fetching ${dir}...`);
-	app.do(() => exec(dir, "git fetch"));
-	app.logger.success(`${dir} has been successfully fetched`);
+async function gist_sync_all() {
+	app.logger.info("Fetching gist info...");
+	const data = await gist_fetch_all(app.opts.user, app.opts.auth);
+	for (const gist of data)
+		git_sync(gist.id, gist.git_pull_url);
+}
+
+// #endregion
+
+// #region repo
+
+/**
+ * @param {string} user
+ * @param {string} auth
+ * @returns {Promise<GitHub.Repository[]>}
+ */
+function repo_fetch_all(user, auth) {
+	return data_fetch("/user/repos", user, auth).then(data => data.filter(repo => repo.owner.login === user));
 }
 
 /**
- * @param {string} url
+ * @returns {Promise}
  */
-function git_clone(url) {
-	app.logger.info(`Cloning ${url}...`);
-	app.do(() => exec(app.root, `git clone ${url}`));
-	app.logger.success(`${url} has been successfully cloned`);
+async function repo_sync_all() {
+	app.logger.info("Fetching repositories info...");
+	const data = await repo_fetch_all(app.opts.user, app.opts.auth);
+	for (const repo of data)
+		git_sync(repo.name, `git@github.com:${app.opts.user}/${repo.name}`);
 }
+
+// #endregion
 
 /**
  * @param {string} type
@@ -171,24 +201,6 @@ function app_create(root, type, opts, logger) {
 	type_check(type);
 	options_check(opts);
 	return {root, opts, logger, do: f => !opts.fake && f()};
-}
-
-/**
- * @param {string} user
- * @param {string} auth
- * @returns {Promise<GitHub.Repository[]>}
- */
-function repo_fetch_all(user, auth) {
-	return data_fetch("/user/repos", user, auth).then(data => data.filter(repo => repo.owner.login === user));
-}
-
-/**
- * @param {string} user
- * @param {string} auth
- * @returns {Promise<GitHub.Gist[]>}
- */
-function gist_fetch_all(user, auth) {
-	return data_fetch("/gists", user, auth).then(data => data.filter(gist => gist.owner.login === user));
 }
 
 /**
