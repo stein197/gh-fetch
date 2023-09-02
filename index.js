@@ -42,6 +42,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const {execSync} = require("node:child_process");
+const {except} = require("@stein197/util/util");
 
 const API_HOST = "https://api.github.com";
 const Type = {
@@ -219,36 +220,6 @@ async function data_fetch(endpoint, user, auth) {
 		page++;
 	}
 	return result;
-}
-
-/**
- * @param {() => void} f
- * @returns {Except}
- */
-function except(f) {
-	let error = null;
-	const obj = {
-		catch(f) {
-			if (error != null) {
-				try {
-					f(error);
-					error = null;
-				} catch (e) {
-					error = e;
-				}
-			}
-			return this;
-		},
-		finally(f) {
-			f();
-		}
-	};
-	try {
-		f();
-	} catch (e) {
-		error = e;
-	}
-	return obj;
 }
 
 /**
