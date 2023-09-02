@@ -76,7 +76,7 @@ async function repo_sync_all() {
 	app.logger.info("Fetching repositories info...");
 	const data = await repo_fetch_all(app.opts.user, app.opts.auth);
 	for (const repo of data)
-		repo_sync(repo);
+		git_sync(repo.name, `git@github.com:${app.opts.user}/${repo.name}`);
 }
 
 /**
@@ -86,29 +86,30 @@ async function gist_sync_all() {
 	app.logger.info("Fetching gist info...");
 	const data = await gist_fetch_all(app.opts.user, app.opts.auth);
 	for (const gist of data)
-		gist_sync(gist);
+		git_sync(gist.id, gist.git_pull_url);
 }
 
 /**
- * @param {GitHub.Repository} repo
+ * @param {string} name
+ * @param {string} url
  */
-function repo_sync(repo) {
-	const repo_dir = path.resolve(app.root, repo.name);
-	const repo_exists = fs.existsSync(repo_dir);
-	if (repo_exists)
+function git_sync(name, url) {
+	const git_dir = path.resolve(app.root, name);
+	const dir_exists = fs.existsSync(git_dir);
+	if (dir_exists)
 		except(() => {
-			git_pull(repo_dir);
+			git_pull(git_dir);
 		}).catch(() => {
-			app.logger.error(`Failed to pull ${repo.name} repository. Trying to fetch it...`);
-			git_fetch(repo_dir);
+			app.logger.error(`Failed to pull ${name}. Trying to fetch it...`);
+			git_fetch(git_dir);
 		}).catch(() => {
-			app.logger.error(`Failed to fetch ${repo.name} repository`);
+			app.logger.error(`Failed to fetch ${name}`);
 		});
 	else
 		try {
-			git_clone(`git@github.com:${app.opts.user}/${repo.name}`);
+			git_clone(url);
 		} catch {
-			app.logger.error(`Failed to clone ${repo.name} repository`);
+			app.logger.error(`Failed to clone ${name}`);
 		}
 }
 
@@ -137,29 +138,6 @@ function git_clone(url) {
 	app.logger.info(`Cloning ${url}...`);
 	app.do(() => exec(app.root, `git clone ${url}`));
 	app.logger.success(`${url} has been successfully cloned`);
-}
-
-/**
- * @param {GitHub.Gist} gist
- */
-function gist_sync(gist) {
-	const gist_dir = path.resolve(app.root, gist.id);
-	const gist_exists = fs.existsSync(gist_dir);
-	if (gist_exists)
-		except(() => {
-			git_pull(gist_dir);
-		}).catch(() => {
-			app.logger.error(`Failed to pull ${gist.id} gist. Trying to fetch it...`);
-			git_fetch(gist_dir);
-		}).catch(() => {
-			app.logger.error(`Failed to fetch ${gist.id} gist`);
-		});
-	else
-		try {
-			git_clone(gist.git_pull_url);
-		} catch {
-			app.logger.error(`Failed to clone ${gist.id} gist`);
-		}
 }
 
 /**
