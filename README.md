@@ -5,7 +5,7 @@ Syncs all GitHub repositories and gists that user have to the current directory.
 Via npm:
 ```
 npm i -g @stein197/gh-sync
-gh-sync {repo | gist} --user <user> --auth <auth>
+gh-sync {repo | gist} --user <user> --auth <auth> [--fake]
 ```
 Or directly from the repository:
 ```
