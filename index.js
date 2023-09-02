@@ -13,9 +13,10 @@
  * 
  * @typedef {{
  * 	id: string;
+ * 	git_pull_url: string;
  * 	owner: {
  * 		login: string;
- * 	}
+ * 	};
  * }} GitHub.Gist
  * 
  * @typedef {{
@@ -141,7 +142,25 @@ function git_clone(url) {
 /**
  * @param {GitHub.Gist} gist
  */
-function gist_sync(gist) {} // TODO
+function gist_sync(gist) {
+	const gist_dir = path.resolve(app.root, gist.id);
+	const gist_exists = fs.existsSync(gist_dir);
+	if (gist_exists)
+		except(() => {
+			git_pull(gist_dir);
+		}).catch(() => {
+			app.logger.error(`Failed to pull ${gist.id} gist. Trying to fetch it...`);
+			git_fetch(gist_dir);
+		}).catch(() => {
+			app.logger.error(`Failed to fetch ${gist.id} gist`);
+		});
+	else
+		try {
+			git_clone(gist.git_pull_url);
+		} catch {
+			app.logger.error(`Failed to clone ${gist.id} gist`);
+		}
+}
 
 /**
  * @param {string} type
