@@ -218,9 +218,9 @@ async function data_fetch(endpoint, user, auth) {
 				Authorization: `token ${auth}`
 			}
 		});
-		if (response.status >= 400)
-			throw new Error(`Failed to fetch data for user ${user} at path ${endpoint}. Status: ${response.status}`);
 		const data = await response.json();
+		if (response.status >= 400)
+			throw new Error(`Failed to fetch data for user ${user} at ${endpoint}: ${data.message}`);
 		if (!Array.isArray(data))
 			throw new Error(`Expected to be array. Actual value: ${JSON.stringify(data)}`);
 		result.push(...data);
